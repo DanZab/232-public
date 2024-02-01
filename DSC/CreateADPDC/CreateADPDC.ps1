@@ -289,6 +289,7 @@ configuration CreateADPDC
             {
                 Ensure                        = "Present"
                 DomainAdministratorCredential = $DomainCreds
+                DomainName                    = $DomainName
                 DependsOn                     = @("[xWaitForADDomain]DscForestWait","[xADOrganizationalUnit]People")
                 UserName                      = $User.name
                 Password                      = "P@$$word1"
@@ -304,6 +305,7 @@ configuration CreateADPDC
             {
                 Ensure                        = "Present"
                 DomainAdministratorCredential = $DomainCreds
+                DomainName                    = $DomainName
                 DependsOn                     = @("[xWaitForADDomain]DscForestWait","[xADOrganizationalUnit]Admins")
                 UserName                      = $AdminUser.name
                 Password                      = "P@$$word1"
