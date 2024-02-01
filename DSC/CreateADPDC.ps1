@@ -126,9 +126,9 @@ configuration CreateADPDC
 
         ForEach ($RootOU in $RootOUs)
         {
-            xADOrganizationalUnit ($RootOU.name).Replace(" ","")
+            xADOrganizationalUnit ($RootOU).Replace(" ","")
             {
-                Name                            = $RootOU.name
+                Name                            = $RootOU
                 Path                            = "$DomainRoot"
                 ProtectedFromAccidentalDeletion = $true
                 Ensure                          = "Present"
