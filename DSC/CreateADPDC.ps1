@@ -219,7 +219,7 @@ configuration CreateADPDC
         {
             DomainName           = $DomainName
             DomainUserCredential = $DomainCreds
-            RetryCount           = $Node.RetryCount
+            RetryCount           = "3"
             RetryIntervalSec     = "300"
             DependsOn            = "[xADDomain]FirstDS"
         }
@@ -233,7 +233,7 @@ configuration CreateADPDC
                 ProtectedFromAccidentalDeletion = $true
                 Ensure                          = "Present"
                 Credential                      = $DomainCreds
-                DependsOn                     = @("[xWaitForADDomain]DscForestWait")
+                DependsOn                       = @("[xWaitForADDomain]DscForestWait")
             }
         }
 
@@ -246,10 +246,10 @@ configuration CreateADPDC
                 ProtectedFromAccidentalDeletion = $true
                 Ensure                          = "Present"
                 Credential                      = $DomainCreds
-                DependsOn                     = @("[xWaitForADDomain]DscForestWait","[xADOrganizationalUnit]$($RootOUs[-1])")
+                DependsOn                       = @("[xWaitForADDomain]DscForestWait","[xADOrganizationalUnit]$($RootOUs[-1])")
             }
         }
-
+        
         ForEach ($User in $Users)
         {
             xADUser $User.name
