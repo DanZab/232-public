@@ -186,7 +186,7 @@ configuration CreateADPDC
                 DependsOn                     = "[xADOrganizationalUnit]People"
                 UserName                      = $User.name
                 Path                          = "OU=People,$DomainRoot"
-                Password                      = $Admincreds.Password
+                Password                      = $Admincreds
                 DisplayName                   = $User.displayname
                 GivenName                     = $User.first
                 Surname                       = $User.last
@@ -203,7 +203,7 @@ configuration CreateADPDC
                 DependsOn                     = "[xADOrganizationalUnit]Admins"
                 UserName                      = $AdminUser.name
                 Path                          = "OU=Admins,OU=People,$DomainRoot"
-                Password                      = $Admincreds.Password
+                Password                      = $Admincreds
                 DisplayName                   = $AdminUser.displayname
                 GivenName                     = $AdminUser.first
                 Surname                       = $AdminUser.last
