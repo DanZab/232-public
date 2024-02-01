@@ -51,6 +51,13 @@ configuration CreateADPDC
         @{name = "NGreene-ADM";first = "Noah";Last = "Greene";displayname = "(Admin) Noah Greene"},
         @{name = "NGreene-DA";first = "Noah";Last = "Greene";displayname = "(DA) Noah Greene"}
     )
+    $Groups = @(
+        @{name = "SEC-ServerAdmins";OU = "OU=Security,OU=Groups,DC=dzab,DC=local";description = "Users with Admin permissions on Servers";members = ($AdminUsers | Where-Object {$_.name -like "*-ADM"}).name},
+        @{name = "SEC-RODCDelegatedAdmins";OU = "OU=Security,OU=Groups,DC=dzab,DC=local";description = "Users with Delegated Admin Permissions on RODCs";members = @()},
+        @{name = "FS-DFS-IT-RW";OU = "OU=File Share,OU=Groups,DC=dzab,DC=local";description = "Read/Write on \\dzab.local\IT$";members = @()},
+        @{name = "APP-BackupUtil-User";OU = "OU=Application,OU=Groups,DC=dzab,DC=local";description = "Login to BackupUtil";members = @()},
+        @{name = "APP-BackupUtil-Admin";OU = "OU=Application,OU=Groups,DC=dzab,DC=local";description = "Admin rights in BackupUtil";members = @()}
+    )
 
     Node localhost
     {
@@ -208,6 +215,29 @@ configuration CreateADPDC
                 GivenName                     = $AdminUser.first
                 Surname                       = $AdminUser.last
             }
+        }
+
+        ForEach ($Group in $Groups)
+        {
+            xADGroup $Group.name
+            {
+                Ensure      = "Present"
+                Credential  = $DomainCreds
+                DependsOn   = @("[xWaitForADDomain]DscForestWait","[xADUser]$($AdminUsers[-1].name)")
+                GroupName   = $Group.name
+                Path        = $Group.OU
+                Description = $Group.description
+                Members     = $Group.members
+            }
+        }
+
+        xADGroup DomainAdmins
+        {
+            Ensure      = "Present"
+            Credential  = $DomainCreds
+            DependsOn   = @("[xWaitForADDomain]DscForestWait","[xADUser]$($AdminUsers[-1].name)")
+            GroupName   = "Domain Admins"
+            Members     = ($AdminUsers | Where-Object {$_.name -like "*-DA"}).name
         }
     }
 }
