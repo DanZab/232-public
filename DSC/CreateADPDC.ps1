@@ -25,13 +25,6 @@ configuration CreateADPDC
         "Groups",
         "Resources"
     )
-    $SubOUs = @(
-        @{name="Admins";path="OU=People,$DomainRoot"},
-        @{name="Security";path="OU=Groups,$DomainRoot"},
-        @{name="Application";path="OU=Groups,$DomainRoot"},
-        @{name="File Share";path="OU=Groups,$DomainRoot"},
-        @{name="RBAC";path="OU=Groups,$DomainRoot"}
-    )
 
     Node localhost
     {
@@ -86,7 +79,8 @@ configuration CreateADPDC
             RetryCount = $RetryCount
         }
 
-        xDisk ADDataDisk {
+        xDisk ADDataDisk 
+        {
             DiskNumber  = 2
             DriveLetter = "F"
             DependsOn   = "[xWaitForDisk]Disk2"
@@ -140,19 +134,6 @@ configuration CreateADPDC
                 Ensure                          = "Present"
                 Credential                      = $DomainCreds
                 DependsOn                       = @("[xWaitForADDomain]DscForestWait")
-            }
-        }
-
-        ForEach ($SubOU in $SubOUs)
-        {
-            xADOrganizationalUnit ($SubOU.name).Replace(" ","")
-            {
-                Name                            = $SubOU.name
-                Path                            = $SubOU.path
-                ProtectedFromAccidentalDeletion = $true
-                Ensure                          = "Present"
-                Credential                      = $DomainCreds
-                DependsOn                       = @("[xWaitForADDomain]DscForestWait","[xADOrganizationalUnit]$($RootOUs[-1])")
             }
         }
         
