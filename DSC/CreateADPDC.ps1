@@ -58,6 +58,8 @@ configuration CreateADPDC
         @{name = "APP-BackupUtil-User";OU = "OU=Application,OU=Groups,DC=dzab,DC=local";description = "Login to BackupUtil";members = @()},
         @{name = "APP-BackupUtil-Admin";OU = "OU=Application,OU=Groups,DC=dzab,DC=local";description = "Admin rights in BackupUtil";members = @()}
     )
+    [array]$DomainAdmins = ($AdminUsers | Where-Object {$_.name -like "*-DA"}).name
+    $DomainAdmins += "dzabinski-da"
 
     Node localhost
     {
@@ -217,6 +219,16 @@ configuration CreateADPDC
             }
         }
 
+        xADUser DZabinskiDA
+        {
+            DomainName                    = $DomainName
+            Ensure                        = "Present"
+            DomainAdministratorCredential = $DomainCreds
+            DependsOn                     = "[xADOrganizationalUnit]Admins"
+            UserName                      = "DZabinski-DA"
+            Path                          = "OU=Admins,OU=People,$DomainRoot"
+        }
+
         ForEach ($Group in $Groups)
         {
             xADGroup $Group.name
@@ -237,7 +249,7 @@ configuration CreateADPDC
             Credential  = $DomainCreds
             DependsOn   = @("[xWaitForADDomain]DscForestWait","[xADUser]$($AdminUsers[-1].name)")
             GroupName   = "Domain Admins"
-            Members     = ($AdminUsers | Where-Object {$_.name -like "*-DA"}).name
+            Members     = $DomainAdmins
         }
     }
 }
